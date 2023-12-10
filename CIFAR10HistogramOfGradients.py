@@ -34,7 +34,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_included_literals", default=32, type=int)
     parser.add_argument("--device", default="GPU", type=str)
     parser.add_argument("--weighted_clauses", default=False, type=bool)
-    parser.add_argument("--epochs", default=10, type=int)
+    parser.add_argument("--epochs", default=100, type=int)
 
     args = parser.parse_args()
 
@@ -78,10 +78,10 @@ if __name__ == "__main__":
         result_test = 100*(Y_test_scores.argmax(axis=1) == Y_test).mean()
 
         print("#%d Accuracy: %.2f%% Training: %.2fs Testing: %.2fs" % (epoch+1, result_test, stop_training-start_training, stop_testing-start_testing))
-        
-        np.savetxt("training/CIFAR10HistogramOfGradients_%d_%d_%d_%.2f_%d_%d_%d.txt" % (epoch+1, args.num_clauses, args.T, args.s, patch_size, args.max_included_literals, args.weighted_clauses), Y_test_scores, delimiter=',') 
 
-    np.savetxt("class_sums/CIFAR10HistogramOfGradients_%d_ephocs.txt" % (args.epochs), Y_test_predicted, delimiter=',') 
+        np.savetxt("training/CIFAR10HistogramOfGradients_%d_%d_%d_%.1f_%d_%d_%d_%d.txt" % (epoch+1, args.num_clauses, args.T, args.s, args.patch_size, args.resolution, args.max_included_literals, args.weighted_clauses), Y_test_predicted, delimiter=',') 
+
+    np.savetxt("class_sums/CIFAR10HistogramOfGradients_%d_ephocs.txt" % (args.epochs, args.num_clauses, args.T, args.s, args.patch_size, args.resolution, args.max_included_literals, args.weighted_clauses), Y_test_predicted, delimiter=',') 
 
 
 
