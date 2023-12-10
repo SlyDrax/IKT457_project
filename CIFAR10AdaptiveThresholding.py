@@ -42,7 +42,6 @@ if __name__ == "__main__":
         max_included_literals=args.max_included_literals,
         platform=args.device,
         weighted_clauses=args.weighted_clauses,
-        type_i_ii_ratio=args.type_i_ii_ratio,
         patch_dim=(args.patch_size, args.patch_size)
     ) 
 
