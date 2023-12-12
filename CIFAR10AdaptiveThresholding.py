@@ -5,6 +5,7 @@ from keras.datasets import cifar10
 import cv2
 from tmu.preprocessing.standard_binarizer.binarizer import StandardBinarizer
 from time import time
+from matplotlib import pyplot as plt
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -28,8 +29,9 @@ if __name__ == "__main__":
     Y_test=Y_test.reshape(Y_test.shape[0])
 
     for i in range(X_train.shape[0]):
-            for j in range(X_train.shape[3]):
-                    X_train[i,:,:,j] = cv2.adaptiveThreshold(X_train_org[i,:,:,j], 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        for j in range(X_train.shape[3]):
+            X_train[i,:,:,j] = cv2.adaptiveThreshold(X_train_org[i,:,:,j], 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
 
     for i in range(X_test.shape[0]):
             for j in range(X_test.shape[3]):

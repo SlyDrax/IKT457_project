@@ -5,6 +5,7 @@ from keras.datasets import cifar10
 import cv2
 from tmu.preprocessing.standard_binarizer.binarizer import StandardBinarizer
 from time import time
+from matplotlib import pyplot as plt
 
 patch_size = 0
 
@@ -30,7 +31,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     (X_train_org, Y_train), (X_test_org, Y_test) = cifar10.load_data()
-
     
     X_train = np.copy(X_train_org)
     X_test = np.copy(X_test_org)
@@ -39,12 +39,14 @@ if __name__ == "__main__":
     Y_test=Y_test.reshape(Y_test.shape[0])
 
     for i in range(X_train.shape[0]):
-        edges = cv2.Canny(X_train_org[i],100,200)
-        X_train[i] = edges
+        edges = cv2.Canny(X_train_org[i],100,300)
+        X_train[i] = np.stack([edges/255] * 3, axis=-1)
+
+        
 
     for i in range(X_test.shape[0]):
-        edges = cv2.Canny(X_test_org[i],100,200)
-        X_test[i] = edges
+        edges = cv2.Canny(X_test_org[i],100,300)
+        X_test[i] = np.stack([edges/255] * 3, axis=-1)
 
 
     tm = TMClassifier(
@@ -55,9 +57,8 @@ if __name__ == "__main__":
         platform=args.device,
         weighted_clauses=args.weighted_clauses,
         patch_dim=(args.patch_size, args.patch_size)
-    ) 
-    print(X_train.shape)
-    print(Y_train.shape)
+    )   
+    
     for epoch in range(args.epochs):
         start_training = time()
         tm.fit(X_train, Y_train)
