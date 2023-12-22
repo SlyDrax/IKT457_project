@@ -3,6 +3,7 @@ from keras.datasets import cifar10
 import ssl
 import importlib  
 from matplotlib import pyplot as plt
+import os
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -11,23 +12,21 @@ ssl._create_default_https_context = ssl._create_unverified_context
 Y_train=Y_train.reshape(Y_train.shape[0])
 Y_test=Y_test.reshape(Y_test.shape[0])
 
-Y_test_scores_threshold = np.loadtxt("class_sums/CIFAR10AdaptiveThresholding_99_2000_500_10.0_10_32_1.txt", delimiter=',')
-Y_test_scores_thermometer_3 = np.loadtxt("class_sums/CIFAR10ColorThermometers_99_2000_1500_2.5_3_8_32_1.txt", delimiter=',')
-Y_test_scores_thermometer_4 = np.loadtxt("class_sums/CIFAR10ColorThermometers_99_2000_1500_2.5_4_8_32_1.txt", delimiter=',')
-Y_test_scores_hog = np.loadtxt("class_sums/CIFAR10HistogramOfGradients_99_2000_50_10.0_0_32_0.txt", delimiter=',')
-Y_test_test = np.loadtxt("class_sums/test.txt", delimiter=",")
-Y_test_test2 = np.loadtxt("class_sums/test2.txt", delimiter=",")
-niblack = np.loadtxt("class_sums/niblack_threshold.txt", delimiter=",")
-print(Y_test[0])
-print(np.max(Y_test_test[0]))
+def loadtxt(filename):
+    if os.path.isfile(filename):
+        tmp = np.loadtxt(filename, delimiter=',')
+        return tmp/(np.max(tmp) - np.min(tmp))
+    else:
+        return []
+ 
 
-Y_test_scores_threshold = Y_test_scores_threshold/(np.max(Y_test_scores_threshold) - np.min(Y_test_scores_threshold))
-Y_test_scores_thermometer_3 = Y_test_scores_thermometer_3/(np.max(Y_test_scores_thermometer_3) - np.min(Y_test_scores_thermometer_3))
-Y_test_scores_thermometer_4 = Y_test_scores_thermometer_4/(np.max(Y_test_scores_thermometer_4) - np.min(Y_test_scores_thermometer_4))
-Y_test_scores_hog = Y_test_scores_hog/(np.max(Y_test_scores_hog) - np.min(Y_test_scores_hog))
-Y_test_test = Y_test_test/(np.max(Y_test_test) - np.min(Y_test_test))
-niblack = niblack/(np.max(niblack) - np.min(niblack))
-Y_test_test2 = Y_test_test2/(np.max(Y_test_test2) - np.min(Y_test_test2))
+Y_test_scores_threshold = loadtxt("class_sums/CIFAR10AdaptiveThresholding_99_2000_500_10.0_10_32_1.txt")
+Y_test_scores_thermometer_3 = loadtxt("class_sums/CIFAR10ColorThermometers_99_2000_1500_2.5_3_8_32_1.txt")
+Y_test_scores_thermometer_4 = loadtxt("class_sums/CIFAR10ColorThermometers_99_2000_1500_2.5_4_8_32_1.txt")
+Y_test_scores_hog = loadtxt("class_sums/CIFAR10HistogramOfGradients_99_2000_50_10.0_0_32_0.txt")
+sauvola = loadtxt("class_sums/sauvola_threshold_10_epochs.txt")
+niblack = loadtxt("class_sums/niblack_threshold_10_epochs.txt")
+canny = loadtxt("class_sums/Canny_Edge_Detection_100_epochs.txt")
 
 def vote_factor(probabilities, i):
     i_max = np.max(probabilities[i])
@@ -42,15 +41,15 @@ def vote_factor(probabilities, i):
 
 
 
-votes = np.zeros(Y_test_scores_threshold.shape, dtype=np.float32)
+votes = np.zeros(canny.shape, dtype=np.float32)
 for i in range(Y_test.shape[0]):
     votes[i] += 1.3*vote_factor(Y_test_scores_threshold, i)
     votes[i] += 2*vote_factor(Y_test_scores_thermometer_3, i)
     votes[i] += 2.4*vote_factor(Y_test_scores_thermometer_4, i)
     votes[i] += 2.5*vote_factor(Y_test_scores_hog, i)
-    votes[i] += 0.5*vote_factor(Y_test_test, i)
-    votes[i] += 0.5*vote_factor(niblack, i)
-    votes[i] += 0.8*vote_factor(Y_test_test2, i)
+    votes[i] += 0.5*vote_factor(sauvola, i)
+    votes[i] += 0.7*vote_factor(niblack, i)
+    votes[i] += 0.5*vote_factor(canny, i)
 
 Y_test_predicted = votes.argmax(axis=1)
 
