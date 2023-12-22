@@ -24,8 +24,8 @@ Y_test_scores_threshold = loadtxt("class_sums/CIFAR10AdaptiveThresholding_99_200
 Y_test_scores_thermometer_3 = loadtxt("class_sums/CIFAR10ColorThermometers_99_2000_1500_2.5_3_8_32_1.txt")
 Y_test_scores_thermometer_4 = loadtxt("class_sums/CIFAR10ColorThermometers_99_2000_1500_2.5_4_8_32_1.txt")
 Y_test_scores_hog = loadtxt("class_sums/CIFAR10HistogramOfGradients_99_2000_50_10.0_0_32_0.txt")
-sauvola = loadtxt("class_sums/sauvola_threshold_10_epochs.txt")
-niblack = loadtxt("class_sums/niblack_threshold_10_epochs.txt")
+sauvola = loadtxt("class_sums/CIFAR10SauvolaThreshold_100_epochs.txt")
+niblack = loadtxt("class_sums/CIFAR10NiblackThreshold_10_epochs.txt")
 canny = loadtxt("class_sums/Canny_Edge_Detection_100_epochs.txt")
 
 def vote_factor(probabilities, i):
@@ -47,7 +47,7 @@ for i in range(Y_test.shape[0]):
     votes[i] += 2*vote_factor(Y_test_scores_thermometer_3, i)
     votes[i] += 2.4*vote_factor(Y_test_scores_thermometer_4, i)
     votes[i] += 2.5*vote_factor(Y_test_scores_hog, i)
-    votes[i] += 0.5*vote_factor(sauvola, i)
+    votes[i] += 0.7*vote_factor(sauvola, i)
     votes[i] += 0.7*vote_factor(niblack, i)
     votes[i] += 0.5*vote_factor(canny, i)
 

@@ -64,20 +64,21 @@ if __name__ == "__main__":
             tm.fit(X_mini_batch, Y_mini_batch)
         stop_training = time()
 
-        start_testing = time()
-        Y_test_predicted, Y_test_scores = tm.predict(X_test, return_class_sums=True)
-        stop_testing = time()
+        if (epoch + 1) % 10 == 0:
+            start_testing = time()
+            Y_test_predicted, Y_test_scores = tm.predict(X_test, return_class_sums=True)
+            stop_testing = time()
 
-        result_test = 100*(Y_test_scores.argmax(axis=1) == Y_test).mean()
+            result_test = 100*(Y_test_scores.argmax(axis=1) == Y_test).mean()
 
-        print("#%d Accuracy: %.2f%% Training: %.2fs Testing: %.2fs" % (epoch+1, result_test, stop_training-start_training, stop_testing-start_testing))
+            print("#%d Accuracy: %.2f%% Training: %.2fs Testing: %.2fs" % (epoch+1, result_test, stop_training-start_training, stop_testing-start_testing))
 
-        np.savetxt("training/CIFAR10NiblackThreshold%d_%d_%d_%.1f_%d_%d_%d.txt" % (epoch+1, args.num_clauses, args.T, args.s, args.patch_size, args.max_included_literals, args.weighted_clauses), Y_test_scores, delimiter=',')
+            np.savetxt("training/CIFAR10NiblackThreshold%d_%d_%d_%.1f_%d_%d_%d.txt" % (epoch+1, args.num_clauses, args.T, args.s, args.patch_size, args.max_included_literals, args.weighted_clauses), Y_test_scores, delimiter=',')
 
     Y_test_predicted, Y_test_scores = tm.predict(X_test, return_class_sums=True)
     result_test = 100*(Y_test_scores.argmax(axis=1) == Y_test).mean()
 
-    np.savetxt("class_sums/CIFAR10NiblackThreshold_%d_ephocs.txt" % (args.epochs), Y_test_predicted, delimiter=',') 
+    np.savetxt("class_sums/CIFAR10NiblackThreshold_%d_ephocs.txt" % (args.epochs), Y_test_scores, delimiter=',') 
 
     print("#%d Accuracy: %.2f%%" % (args.epochs, result_test))
 

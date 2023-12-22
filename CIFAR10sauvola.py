@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_included_literals", default=32, type=int)
     parser.add_argument("--device", default="GPU", type=str)
     parser.add_argument("--weighted_clauses", default=True, type=bool)
-    parser.add_argument("--epochs", default=10, type=int)
+    parser.add_argument("--epochs", default=100, type=int)
     parser.add_argument("--patch_size", default=10, type=int)
 
     args = parser.parse_args()
@@ -35,6 +35,8 @@ if __name__ == "__main__":
     window_size = 25
     for i in range(X_train.shape[0]):
         niblack = ski.filters.threshold_sauvola(X_train_org[i], window_size=window_size)
+        print(niblack)
+        exit()
         binary_niblack = X_train_org[i] > niblack
         X_train[i] = binary_niblack
 
@@ -72,9 +74,9 @@ if __name__ == "__main__":
     
             print("#%d Accuracy: %.2f%% Training: %.2fs Testing: %.2fs" % (epoch+1, result_test, stop_training-start_training, stop_testing-start_testing))
     
-            np.savetxt("training/CIFAR10NiblackThreshold%d_%d_%d_%.1f_%d_%d_%d.txt" % (epoch+1, args.num_clauses, args.T, args.s, args.patch_size, args.max_included_literals, args.weighted_clauses), Y_test_scores, delimiter=',')
+            np.savetxt("training/CIFAR10SauvolaThreshold_%d_%d_%d_%.1f_%d_%d_%d.txt" % (epoch+1, args.num_clauses, args.T, args.s, args.patch_size, args.max_included_literals, args.weighted_clauses), Y_test_scores, delimiter=',')
 
-    np.savetxt("class_sums/CIFAR10NiblackThreshold_%d_ephocs.txt" % (args.epochs), Y_test_scores, delimiter=',') 
+    np.savetxt("class_sums/CIFAR10SauvolaThreshold_%d_ephocs.txt" % (args.epochs), Y_test_scores, delimiter=',') 
 
     print("#%d Accuracy: %.2f%%" % (args.epochs, result_test))
 

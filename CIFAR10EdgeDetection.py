@@ -48,18 +48,12 @@ if __name__ == "__main__":
     detector = CENSURE(1, 9)
 
     for i in range(X_train.shape[0]):
-        gray = rgb2gray(X_train_org[i])
-        equal = None
-        equal = cv2.equalizeHist(gray, equal)
-        edges = ski.feature.canny(equal)
+        edges = ski.feature.canny(rgb2gray(X_train_org[i]))
         fill_edges = sp.ndimage.binary_fill_holes(edges)
         X_train[i] = gray2rgb(fill_edges)
 
     for i in range(X_test.shape[0]):
-        gray = rgb2gray(X_test_org[i])
-        equal = None
-        equal = cv2.equalizeHist(gray, equal)
-        edges = ski.feature.canny(equal)
+        edges = ski.feature.canny(rgb2gray(X_test_org[i]))
         fill_edges = sp.ndimage.binary_fill_holes(edges)
         X_test[i] = gray2rgb(fill_edges)
 
@@ -83,18 +77,19 @@ if __name__ == "__main__":
             Y_mini_batch = Y_train[i:i+mini_batch_size]
             tm.fit(X_mini_batch, Y_mini_batch)
         stop_training = time()
+        if (epoch + 1) % 10:
     
-        start_testing = time()
-        Y_test_predicted, Y_test_scores = tm.predict(X_test, return_class_sums=True)
-        stop_testing = time()
-    
-        result_test = 100*(Y_test_scores.argmax(axis=1) == Y_test).mean()
-
-        print("#%d Accuracy: %.2f%% Training: %.2fs Testing: %.2fs" % (epoch+1, result_test, stop_training-start_training, stop_testing-start_testing))
+            start_testing = time()
+            Y_test_predicted, Y_test_scores = tm.predict(X_test, return_class_sums=True)
+            stop_testing = time()
         
-        np.savetxt("training/CIFAR10EdgeDetection_%d_%d_%d_%.2f_%d_%d_%d_%.2f%%.txt" % (epoch+1, args.num_clauses, args.T, args.s, args.patch_size, args.max_included_literals, args.weighted_clauses, result_test), Y_test_scores, delimiter=',') 
+            result_test = 100*(Y_test_scores.argmax(axis=1) == Y_test).mean()
+            print("#%d Accuracy: %.2f%% Training: %.2fs Testing: %.2fs" % (epoch+1, result_test, stop_training-start_training, stop_testing-start_testing))
+            
+            np.savetxt("training/CIFAR10EdgeDetection_%d_%d_%d_%.2f_%d_%d_%d_%.2f%%.txt" % (epoch+1, args.num_clauses, args.T, args.s, args.patch_size, args.max_included_literals, args.weighted_clauses, result_test), Y_test_scores, delimiter=',') 
 
-    np.savetxt("class_sums/CIFAR10EdgeDetection_%d_ephocs_%.2f%%_accuracy.txt" % (args.epochs, result_test), Y_test_predicted, delimiter=',') 
+    Y_test_predicted, Y_test_scores = tm.predict(X_test, return_class_sums=True)
+    np.savetxt("class_sums/CIFAR10EdgeDetection_%d_ephocs.txt" % (args.epochs, result_test), Y_test_scores, delimiter=',') 
 
 
 
